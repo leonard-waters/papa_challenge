@@ -3,13 +3,25 @@ defmodule PapaChallenge.MixProject do
 
   def project do
     [
+      aliases: aliases(),
       app: :papa_challenge,
-      version: "0.1.0",
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
+      deps: deps(),
+      dialyzer: [
+        plt_add_deps: :apps_tree,
+        plt_add_apps: [:mix, :ex_unit],
+        plt_file: {:no_warn, "priv/plts/dialyzer.plt"},
+        flags: [
+          :unmatched_returns,
+          :error_handling,
+          :race_conditions,
+          :no_opaque
+        ],
+        ignore_warnings: ".dialyzer_ignore.exs"
+      ],
       start_permanent: Mix.env() == :prod,
-      aliases: aliases(),
-      deps: deps()
+      version: "0.1.0"
     ]
   end
 
@@ -32,21 +44,23 @@ defmodule PapaChallenge.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:credo, "~> 1.7.0", only: [:dev], runtime: false},
+      {:dialyxir, "~> 1.3.0", only: [:dev], runtime: false},
+      {:ecto_sql, "~> 3.6"},
+      {:esbuild, "~> 0.7", runtime: Mix.env() == :dev},
+      {:floki, ">= 0.30.0", only: :test},
+      {:jason, "~> 1.2"},
       {:phoenix, "~> 1.7.2"},
       {:phoenix_ecto, "~> 4.4"},
-      {:ecto_sql, "~> 3.6"},
-      {:postgrex, ">= 0.0.0"},
       {:phoenix_html, "~> 3.3"},
+      {:phoenix_live_dashboard, "~> 0.7.2"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_view, "~> 0.18.16"},
-      {:floki, ">= 0.30.0", only: :test},
-      {:phoenix_live_dashboard, "~> 0.7.2"},
-      {:esbuild, "~> 0.7", runtime: Mix.env() == :dev},
+      {:plug_cowboy, "~> 2.5"},
+      {:postgrex, ">= 0.0.0"},
       {:tailwind, "~> 0.2.0", runtime: Mix.env() == :dev},
       {:telemetry_metrics, "~> 0.6"},
-      {:telemetry_poller, "~> 1.0"},
-      {:jason, "~> 1.2"},
-      {:plug_cowboy, "~> 2.5"}
+      {:telemetry_poller, "~> 1.0"}
     ]
   end
 

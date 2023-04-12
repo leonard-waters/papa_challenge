@@ -35,3 +35,10 @@ papa_challenge-*.tar
 npm-debug.log
 /assets/node_modules/
 
+#dialyzer plts
+/priv/plts/*.plt
+/priv/plts/*.plt.hash
+
+#Elixir Language Server
+/.elixir_ls
+
