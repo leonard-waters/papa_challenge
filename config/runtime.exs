@@ -63,6 +63,7 @@ if config_env() == :prod do
     ],
     secret_key_base: secret_key_base
 
+  config :swoosh, :api_client, Swoosh.ApiClient.Hackney
   # ## SSL Support
   #
   # To get SSL working, you will need to add the `https` key

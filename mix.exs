@@ -44,12 +44,14 @@ defmodule PapaChallenge.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:bcrypt_elixir, "~> 3.0"},
       {:credo, "~> 1.7.0", only: [:dev], runtime: false},
       {:dialyxir, "~> 1.3.0", only: [:dev], runtime: false},
       {:ecto_sql, "~> 3.6"},
       {:esbuild, "~> 0.7", runtime: Mix.env() == :dev},
       {:floki, ">= 0.30.0", only: :test},
       {:jason, "~> 1.2"},
+      {:hackney, "~> 1.9"},
       {:phoenix, "~> 1.7.2"},
       {:phoenix_ecto, "~> 4.4"},
       {:phoenix_html, "~> 3.3"},
@@ -58,6 +60,7 @@ defmodule PapaChallenge.MixProject do
       {:phoenix_live_view, "~> 0.18.16"},
       {:plug_cowboy, "~> 2.5"},
       {:postgrex, ">= 0.0.0"},
+      {:swoosh, "~> 1.3"},
       {:tailwind, "~> 0.2.0", runtime: Mix.env() == :dev},
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 1.0"}

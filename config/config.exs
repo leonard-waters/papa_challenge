@@ -20,6 +20,17 @@ config :papa_challenge, PapaChallengeWeb.Endpoint,
   pubsub_server: PapaChallenge.PubSub,
   live_view: [signing_salt: "YKRxlqgH"]
 
+# Configures the mailer
+#
+# By default it uses the "Local" adapter which stores the emails
+# locally. You can see the emails in your browser, at "/dev/mailbox".
+#
+# For production it's recommended to configure a different adapter
+# at the `config/runtime.exs`.
+config :papa_challenge, PapaChallenge.Mailer, adapter: Swoosh.Adapters.Local
+
+# Swoosh API client is needed for adapters other than SMTP.
+config :swoosh, :api_client, false
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.17.11",
@@ -53,3 +64,4 @@ config :phoenix, :json_library, Jason
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"
+BQrpGyeT9o@LF@Yx

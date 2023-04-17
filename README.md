@@ -22,10 +22,15 @@ flowchart TD
     USER_DASHBOARD -->|Member Role| MEMBER_TAB
     subgraph PAPA_PAL_TAB
     PRD[["Displays: 
-                Available Requested Visits
+                Upcoming Visits:
                     Sort by:
-                        - datetime
-                        - highest estimated duration
+                        - datetime desc (default)
+                        - highest duration
+                        - task difficulty
+                Available Visits:
+                    Sort by:
+                        - datetime desc (default)
+                        - highest duration
                         - task difficulty
                     Select a visit to fulfill
                 Available Credits
@@ -37,6 +42,7 @@ flowchart TD
                     Form contains:
                         - task (default duration)
                         - datetime
+                        - estimated duration
                 Available Credits
      ")
     end
@@ -53,25 +59,51 @@ flowchart TD
           - Task(s)
           - Datetime
           ")
-    end
-    
-    
-  
+    end  
 ```
 
-To start your Phoenix server:
+Post MVP Roadmap:
+
+* do not allow Pals to select visits that overlap with another visit based on estimated duration and datetime
+* password requirements
+* forgot password
+* 2FA / OTP
+* RBAC
+* more granular email validation
+* admin dashboard to show metrics
+  * visits this month
+  * revenue to date
+  * users
+    * pals
+    * members
+  * top tasks
+  * upcoming scheduled visits
+  * most recently completed visits
+* allow users to edit name and email
+* allow users to upload avatar images
+* require users to upload drivers license and selfie
+
+  
+To start this application:
 
   * Run `mix setup` to install and setup dependencies
   * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
 
 Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+Available APIs:
 
-## Learn more
-
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+* /user
+  * GET /user/<user_id>
+  * GET /user/<user_id>/transactions
+  * GET /user/<user_id>/visits
+  * POST /user
+  * POST /user/<user_id>
+* /visit
+  * GET  /visit/<visit_id>
+  * POST /visit
+  * POST /visit/<visit_id>
+* /transaction
+  * GET  /transaction/<transaction_id>
+  * POST /transaction
+  * POST /transaction/<transaction_id>
