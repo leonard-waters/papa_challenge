@@ -4,9 +4,23 @@ defmodule PapaChallengeWeb.VisitLiveTest do
   import Phoenix.LiveViewTest
   import PapaChallenge.VisitsFixtures
 
-  @create_attrs %{}
-  @update_attrs %{}
-  @invalid_attrs %{}
+  @create_attrs %{
+    tasks: [:appointment],
+    start_datetime: NaiveDateTime.utc_now()|> NaiveDateTime.add(1, :day),
+    minutes: 60
+  }
+  @update_attrs %{
+    tasks: [:errand],
+    start_datetime: NaiveDateTime.utc_now()|> NaiveDateTime.add(1, :day),
+    minutes: 120
+  }
+  @invalid_attrs %{
+    member_id: nil,
+    tasks: nil,
+    start_datetime: nil,
+    status: nil,
+    minutes: -2
+  }
 
   defp create_visit(_) do
     visit = visit_fixture()
@@ -65,44 +79,7 @@ defmodule PapaChallengeWeb.VisitLiveTest do
       html = render(index_live)
       assert html =~ "Visit updated successfully"
     end
-
-    test "deletes visit in listing", %{conn: conn, visit: visit} do
-      {:ok, index_live, _html} = live(conn, ~p"/visits")
-
-      assert index_live |> element("#visits-#{visit.id} a", "Delete") |> render_click()
-      refute has_element?(index_live, "#visits-#{visit.id}")
-    end
   end
 
-  describe "Show" do
-    setup [:create_visit]
 
-    test "displays visit", %{conn: conn, visit: visit} do
-      {:ok, _show_live, html} = live(conn, ~p"/visits/#{visit}")
-
-      assert html =~ "Show Visit"
-    end
-
-    test "updates visit within modal", %{conn: conn, visit: visit} do
-      {:ok, show_live, _html} = live(conn, ~p"/visits/#{visit}")
-
-      assert show_live |> element("a", "Edit") |> render_click() =~
-               "Edit Visit"
-
-      assert_patch(show_live, ~p"/visits/#{visit}/show/edit")
-
-      assert show_live
-             |> form("#visit-form", visit: @invalid_attrs)
-             |> render_change() =~ "can&#39;t be blank"
-
-      assert show_live
-             |> form("#visit-form", visit: @update_attrs)
-             |> render_submit()
-
-      assert_patch(show_live, ~p"/visits/#{visit}")
-
-      html = render(show_live)
-      assert html =~ "Visit updated successfully"
-    end
-  end
 end

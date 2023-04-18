@@ -13,6 +13,7 @@ defmodule PapaChallenge.Accounts.User do
     field :first_name, :string
     field :last_name, :string
     field :email, :string
+    # Defaults to 60 for demo purposes
     field :balance_in_minutes, :integer, default: 60
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
@@ -158,7 +159,12 @@ defmodule PapaChallenge.Accounts.User do
     if valid_password?(changeset.data, password) do
       changeset
     else
-      add_error(changeset, :current_password, "is not valid")
     end
+  end
+
+  def balance_changeset(user, attrs) do
+    user
+    |> cast(attrs, [:balance_in_minutes])
+    |> validate_number(:balance_in_minutes, greater_than_or_equal_to: 0)
   end
 end

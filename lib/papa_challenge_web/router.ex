@@ -73,17 +73,17 @@ defmodule PapaChallengeWeb.Router do
     delete "/users/log_out", UserSessionController, :delete
 
     live_session :current_user,
-      on_mount: [{PapaChallengeWeb.UserAuth, :mount_current_user}] do
+      on_mount: [{PapaChallengeWeb.UserAuth, :ensure_authenticated}] do
       live "/users/confirm/:token", UserConfirmationLive, :edit
       live "/users/confirm", UserConfirmationInstructionsLive, :new
 
       get "/", PageController, :home
 
       live "/visits", VisitLive.Index, :index
-      live "/visits/:id", VisitRequestLive, :edit
-      live "/visits/history", VisitHistoryLive, :history
-      live "/visits/request", VisitRequestLive, :new
-      live "/visits/:id/fulfill", VisitFulfillLive, :fulfill_visit
+      live "/visits/:id/edit", VisitLive.Index, :edit
+      live "/visits/history", VisitLive.Index, :history
+      live "/visits/request", VisitLive.Index, :request
+      live "/visits/:id/fulfill", VisitLive.Index, :fulfill
     end
   end
 end

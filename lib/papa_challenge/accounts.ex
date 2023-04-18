@@ -122,6 +122,19 @@ defmodule PapaChallenge.Accounts do
   end
 
   @doc """
+
+  """
+  def update_user_balance_by_id(user_id, balance_adjustment) do
+    user = get_user!(user_id)
+
+    user
+    |> User.balance_changeset(%{
+      balance_in_minutes: user.balance_in_minutes + balance_adjustment
+    })
+    |> Repo.update()
+  end
+
+  @doc """
   Emulates that the email will change without actually changing
   it in the database.
 

@@ -8,23 +8,25 @@ defmodule PapaChallenge.MixProject do
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
       deps: deps(),
-      dialyzer: [
-        plt_add_deps: :apps_tree,
-        plt_add_apps: [:mix, :ex_unit],
-        plt_file: {:no_warn, "priv/plts/dialyzer.plt"},
-        flags: [
-          :unmatched_returns,
-          :error_handling,
-          :race_conditions,
-          :no_opaque
-        ],
-        ignore_warnings: ".dialyzer_ignore.exs"
-      ],
+      dialyzer: dialyzer(),
       start_permanent: Mix.env() == :prod,
       version: "0.1.0"
     ]
   end
 
+  defp dialyzer do
+    [
+      plt_add_deps: :apps_tree,
+      plt_add_apps: [:mix],
+      plt_file: {:no_warn, "priv/plts/dialyzer.plt"},
+      flags: [
+        :unmatched_returns,
+        :error_handling,
+        :no_opaque
+      ],
+      ignore_warnings: ".dialyzer_ignore.exs"
+    ]
+  end
   # Configuration for the OTP application.
   #
   # Type `mix help compile.app` for more information.

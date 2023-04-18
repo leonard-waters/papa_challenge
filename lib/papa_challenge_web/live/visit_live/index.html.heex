@@ -1,45 +1,51 @@
 <.header>
-    Listing Available Visit Requests
-    <:actions>
-        <.link patch={~p"/visits/request"}>
-            <.button>Request New Visit</.button>
-        </.link>
-    </:actions>
+  Listing Available Visit Requests
+  <:actions>
+    <.link patch={~p"/visits/request"}>
+      <%= if @current_user.balance_in_minutes >= 0 do %>
+        <.button>Request Visit</.button>
+      <% else %>
+        <.button phx-disable-with="Balance Zero">Request Visit</.button>
+      <% end %>
+    </.link>
+  </:actions>
 </.header>
-<.table
-  id="visits"
-  rows={@visits}
-  row_click={&JS.navigate(~p"/visits/#{&1}")}>
->
-  <:col :let={visit} label="Start Date and Time"><%= visit.start_datetime %></:col>
-  <:col :let={visit} label="Tasks"><%= visit.tasks %></:col>
-  <:col :let={visit} label="Minutes"><%= visit.minutes %></:col>
-  <:col :let={visit} label="Status"><%= visit.status %></:col>
-  <:col :let={visit} label="Member Name"><%= visit.member.first_name %></:col>
+<.table id="visits" rows={@streams.visits}>
+  <:col :let={{_id, visit}} label="Start Date and Time">
+    <%= NaiveDateTime.to_string(visit.start_datetime) %>
+  </:col>
+  <:col :let={{_id, visit}} label="End Date and Time">
+    <%= if visit.end_datetime do %>
+      <%= NaiveDateTime.to_string(visit.end_datetime) %>
+    <% end %>
+  </:col>
+  <:col :let={{_id, visit}} label="Tasks"><%= Enum.join(visit.tasks, ", ") %></:col>
+  <:col :let={{_id, visit}} label="Minutes"><%= visit.minutes %></:col>
+  <:col :let={{_id, visit}} label="Status"><%= visit.status %></:col>
+
   <:action :let={{_id, visit}}>
-    <%= if @current_user.id == visit.member_id do %>
-        <div class="sr-only">
-            <.link navigate={~p"/visits"}>Edit</.link>
-        </div>
-    <% else %>
-        <div class="sr-only">
-            <.link navigate={~p"/visits/:id/fulfill"}>Fulfill</.link>
-        </div>
+    <%= if visit.status != :fulfilled do %>
+      <%= if @current_user.id == visit.member_id do %>
+        <.link patch={~p"/visits/#{visit.id}/edit"}> Edit </.link>
+      <% else %>
+        <.link patch={~p"/visits/#{visit.id}/fulfill"}> Fulfill </.link>
+      <% end %>
     <% end %>
   </:action>
 </.table>
 <.modal
-  :if={@live_action in [:new, :edit]}
+  :if={@live_action in [:request, :edit, :fulfill]}
   id="visit-modal"
   show
-  on_cancel={JS.navigate(~p"/visits")}
+  on_cancel={JS.patch(~p"/visits")}
 >
   <.live_component
     module={PapaChallengeWeb.VisitLive.FormComponent}
-    id={@visit.id || :new}
+    id={@visit.id || :request || :fulfill}
     title={@page_title}
     action={@live_action}
     visit={@visit}
-    navigate={~p"/visits"}
+    current_user={@current_user}
+    patch={~p"/visits"}
   />
 </.modal>
