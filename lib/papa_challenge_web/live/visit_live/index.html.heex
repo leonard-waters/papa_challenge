@@ -1,0 +1,45 @@
+<.header>
+    Listing Available Visit Requests
+    <:actions>
+        <.link patch={~p"/visits/request"}>
+            <.button>Request New Visit</.button>
+        </.link>
+    </:actions>
+</.header>
+<.table
+  id="visits"
+  rows={@visits}
+  row_click={&JS.navigate(~p"/visits/#{&1}")}>
+>
+  <:col :let={visit} label="Start Date and Time"><%= visit.start_datetime %></:col>
+  <:col :let={visit} label="Tasks"><%= visit.tasks %></:col>
+  <:col :let={visit} label="Minutes"><%= visit.minutes %></:col>
+  <:col :let={visit} label="Status"><%= visit.status %></:col>
+  <:col :let={visit} label="Member Name"><%= visit.member.first_name %></:col>
+  <:action :let={{_id, visit}}>
+    <%= if @current_user.id == visit.member_id do %>
+        <div class="sr-only">
+            <.link navigate={~p"/visits"}>Edit</.link>
+        </div>
+    <% else %>
+        <div class="sr-only">
+            <.link navigate={~p"/visits/:id/fulfill"}>Fulfill</.link>
+        </div>
+    <% end %>
+  </:action>
+</.table>
+<.modal
+  :if={@live_action in [:new, :edit]}
+  id="visit-modal"
+  show
+  on_cancel={JS.navigate(~p"/visits")}
+>
+  <.live_component
+    module={PapaChallengeWeb.VisitLive.FormComponent}
+    id={@visit.id || :new}
+    title={@page_title}
+    action={@live_action}
+    visit={@visit}
+    navigate={~p"/visits"}
+  />
+</.modal>

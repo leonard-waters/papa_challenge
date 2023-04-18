@@ -13,15 +13,6 @@ defmodule PapaChallengeWeb.Router do
     plug :fetch_current_user
   end
 
-  scope "/", PapaChallengeWeb do
-    pipe_through :browser
-
-    get "/", PageController, :home
-
-    live "/login", UserLoginLive, :login
-    live "/register", UserRegisterLive, :create_user
-  end
-
   # Enables the Swoosh mailbox preview in development.
   #
   # Note that preview only shows emails that were sent by the same
@@ -85,6 +76,14 @@ defmodule PapaChallengeWeb.Router do
       on_mount: [{PapaChallengeWeb.UserAuth, :mount_current_user}] do
       live "/users/confirm/:token", UserConfirmationLive, :edit
       live "/users/confirm", UserConfirmationInstructionsLive, :new
+
+      get "/", PageController, :home
+
+      live "/visits", VisitLive.Index, :index
+      live "/visits/:id", VisitRequestLive, :edit
+      live "/visits/history", VisitHistoryLive, :history
+      live "/visits/request", VisitRequestLive, :new
+      live "/visits/:id/fulfill", VisitFulfillLive, :fulfill_visit
     end
   end
 end
