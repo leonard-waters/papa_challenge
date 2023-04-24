@@ -21,7 +21,7 @@ defmodule PapaChallenge.AccountsFixtures do
     Enum.into(attrs, %{
       first_name: "Bob",
       last_name: "Robert",
-      balance_in_minutes: 10,
+      balance_in_minutes: 60,
       email: unique_user_email(),
       password: valid_user_password()
     })

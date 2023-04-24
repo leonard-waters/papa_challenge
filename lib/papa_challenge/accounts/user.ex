@@ -6,7 +6,8 @@ defmodule PapaChallenge.Accounts.User do
     :first_name,
     :last_name,
     :email,
-    :password
+    :password,
+    :balance_in_minutes
   ]
 
   schema "users" do
@@ -159,6 +160,7 @@ defmodule PapaChallenge.Accounts.User do
     if valid_password?(changeset.data, password) do
       changeset
     else
+      add_error(changeset, :current_password, "is not valid")
     end
   end
 

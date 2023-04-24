@@ -37,6 +37,7 @@ defmodule PapaChallenge.Visits.Visit do
 
   def fulfill_changeset(visit, attrs) do
     cast(visit, attrs, [:end_datetime, :status])
+    |> validate_balance_in_minutes(attrs)
   end
 
   defp validate_start_datetime(changeset) do
@@ -53,11 +54,9 @@ defmodule PapaChallenge.Visits.Visit do
     end
   end
 
-  defp validate_balance_in_minutes(changeset, %{"minutes" => ""}), do: changeset
+  defp validate_balance_in_minutes(changeset, %{minutes: nil}), do: changeset
 
-  defp validate_balance_in_minutes(changeset, %{"member_id" => member_id, "minutes" => minutes}) do
-    minutes = String.to_integer(minutes)
-
+  defp validate_balance_in_minutes(changeset, %{member_id: member_id, minutes: minutes}) do
     case Accounts.get_user!(member_id) do
       %{balance_in_minutes: balance} when balance >= minutes ->
         changeset

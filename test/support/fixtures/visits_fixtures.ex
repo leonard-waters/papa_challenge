@@ -8,13 +8,13 @@ defmodule PapaChallenge.VisitsFixtures do
   Generate a visit and the prerequisite member.
   """
   def visit_fixture(attrs \\ %{}) do
-    user = PapaChallenge.AccountsFixtures.user_fixture()
+    user = PapaChallenge.AccountsFixtures.user_fixture(attrs)
     future_datetime = NaiveDateTime.utc_now() |> NaiveDateTime.add(2, :day)
 
     {:ok, visit} =
       Enum.into(attrs, %{
         start_datetime: future_datetime,
-        minutes: 0,
+        minutes: 60,
         status: :requested,
         tasks: [:appointment, :errand],
         member_id: user.id
@@ -38,7 +38,7 @@ defmodule PapaChallenge.VisitsFixtures do
         pal_id: pal.id,
         visit_id: member_visit.id
       })
-      |> PapaChallenge.Visits.create_transaction()
+      |> PapaChallenge.Visits.Transactions.create_transaction()
 
     transaction
   end

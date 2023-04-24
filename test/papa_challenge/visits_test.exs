@@ -3,7 +3,9 @@ defmodule PapaChallenge.VisitsTest do
 
   use PapaChallenge.DataCase
 
+  alias PapaChallenge.Accounts
   alias PapaChallenge.Visits
+  alias PapaChallenge.Visits.Transactions
 
   describe "visits" do
     alias PapaChallenge.Visits.Visit
@@ -59,6 +61,21 @@ defmodule PapaChallenge.VisitsTest do
       assert {:error, %Ecto.Changeset{}} = Visits.create_visit(valid_attrs)
     end
 
+    test "create_visit/1 fails when balance is zero" do
+      member = PapaChallenge.AccountsFixtures.user_fixture(%{balance_in_minutes: 0})
+      tomorrow = NaiveDateTime.utc_now() |> NaiveDateTime.add(1, :day)
+
+      valid_attrs = %{
+        start_datetime: tomorrow,
+        minutes: 60,
+        status: :requested,
+        tasks: [:appointment, :errand],
+        member_id: member.id
+      }
+
+      assert {:error, %Ecto.Changeset{}} = Visits.create_visit(valid_attrs)
+    end
+
     test "create_visit/1 with invalid data returns error changeset" do
       assert {:error, %Ecto.Changeset{}} = Visits.create_visit(@invalid_attrs)
     end
@@ -95,37 +112,66 @@ defmodule PapaChallenge.VisitsTest do
   end
 
   describe "transaction" do
-    alias PapaChallenge.Visits.Transaction
-
     import PapaChallenge.VisitsFixtures
 
-    @invalid_attrs %{}
+    @invalid_attrs %{
+      member_id: nil,
+      tasks: nil,
+      start_datetime: nil,
+      status: nil,
+      minutes: -2
+    }
 
     test "list_transaction/0 returns all transaction" do
       transaction = transaction_fixture()
-      assert Visits.list_transaction() == [transaction]
+      assert Transactions.list_transaction() == [transaction]
     end
 
     test "get_transaction!/1 returns the transaction with given id" do
       transaction = transaction_fixture()
-      assert Visits.get_transaction!(transaction.id) == transaction
+      assert Transactions.get_transaction!(transaction.id) == transaction
     end
 
-    test "create_transaction/1 with valid data creates a transaction" do
-      member_visit = visit_fixture()
-      pal = PapaChallenge.AccountsFixtures.user_fixture(%{email: "test@example.com"})
+    test "create_transaction/1 with valid data creates a transaction and calculates balances correctly" do
+      visit_minutes = 60
 
-      valid_attrs = %{
-        member_id: member_visit.member_id,
-        pal_id: pal.id,
-        visit_id: member_visit.id
-      }
+      %{minutes: visit_minutes} = member_visit = visit_fixture(%{minutes: visit_minutes})
+      %{balance_in_minutes: og_pal_balance} = pal = PapaChallenge.AccountsFixtures.user_fixture()
+      %{balance_in_minutes: og_mem_balance} = Accounts.get_user!(member_visit.member_id)
 
-      assert {:ok, %Transaction{} = _transaction} = Visits.create_transaction(valid_attrs)
+      assert {:ok, _} = Visits.fulfill_visit(member_visit, pal.id)
+      assert %{balance_in_minutes: final_pal_balance} = Accounts.get_user!(pal.id)
+      assert final_pal_balance == og_pal_balance + trunc(visit_minutes * 0.85)
+      assert %{balance_in_minutes: final_mem_balance} = Accounts.get_user!(member_visit.member_id)
+      assert final_mem_balance == og_mem_balance - visit_minutes
+    end
+
+    setup do
+      visit_minutes = 100
+      visit = visit_fixture(%{balance_in_minutes: visit_minutes, minutes: visit_minutes})
+      %{visit: visit}
+    end
+
+    test "create_transaction/1 with fails to create a transaction when member balance is 0", %{
+      visit: visit
+    } do
+      %{balance_in_minutes: og_pal_balance} = pal = PapaChallenge.AccountsFixtures.user_fixture()
+
+      member = Accounts.get_user!(visit.member_id)
+
+      {:ok, %{balance_in_minutes: og_mem_balance}} =
+        Accounts.update_user_balance(member, %{balance_in_minutes: 0})
+
+      assert {:error, :member, _error_changeset, %{}} = Visits.fulfill_visit(visit, pal.id)
+      assert %{balance_in_minutes: final_pal_balance} = Accounts.get_user!(pal.id)
+      assert final_pal_balance == og_pal_balance
+
+      assert %{balance_in_minutes: final_mem_balance} = Accounts.get_user!(visit.member_id)
+      assert final_mem_balance == og_mem_balance
     end
 
     test "create_transaction/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Visits.create_transaction(@invalid_attrs)
+      assert {:error, %Ecto.Changeset{}} = Transactions.create_transaction(@invalid_attrs)
     end
   end
 end

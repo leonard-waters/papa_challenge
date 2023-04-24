@@ -9,7 +9,7 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
-alias PapaChallenge.{Accounts, Visits, Visits.Transactions.Query}
+alias PapaChallenge.{Accounts, Visits, Visits.Transactions}
 
 {:ok, pal} =
   Accounts.register_user(%{
@@ -41,14 +41,14 @@ alias PapaChallenge.{Accounts, Visits, Visits.Transactions.Query}
   })
   |> IO.inspect()
 
-  Visits.create_visit(%{
-    member_id: member_pal.id,
-    tasks: [:appointment],
-    start_datetime: NaiveDateTime.utc_now()|> NaiveDateTime.add(1, :day),
-    status: :requested,
-    minutes: 60
-  })
-  |> IO.inspect()
+Visits.create_visit(%{
+  member_id: member_pal.id,
+  tasks: [:appointment],
+  start_datetime: NaiveDateTime.utc_now() |> NaiveDateTime.add(1, :day),
+  status: :requested,
+  minutes: 60
+})
+|> IO.inspect()
 
 {:ok, fulfilled_visit} =
   Visits.create_visit(%{
@@ -61,7 +61,7 @@ alias PapaChallenge.{Accounts, Visits, Visits.Transactions.Query}
   })
   |> IO.inspect()
 
-Query.create_transaction(%{
+Transactions.create_transaction(%{
   member_id: member.id,
   pal_id: pal.id,
   visit_id: fulfilled_visit.id

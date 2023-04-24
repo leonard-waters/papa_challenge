@@ -27,6 +27,7 @@ defmodule PapaChallenge.MixProject do
       ignore_warnings: ".dialyzer_ignore.exs"
     ]
   end
+
   # Configuration for the OTP application.
   #
   # Type `mix help compile.app` for more information.

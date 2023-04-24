@@ -1,4 +1,4 @@
-defmodule PapaChallenge.Visits.Transactions.Query do
+defmodule PapaChallenge.Visits.Transactions do
   @moduledoc """
   The Visits context.
   """

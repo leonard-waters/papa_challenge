@@ -8,7 +8,7 @@
 
 Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
-First a new user must `Register` before logging into the application. The seeded users all use the same password, `passwordtest`. The seeded user emails are `pal@test.com` `member@test.com` and `memberpal@test.com`
+A new user must `Register` before logging into the application. The seeded users all use the same password, `passwordtest`. The seeded user emails are `pal@test.com` `member@test.com` and `memberpal@test.com`
 
 New members are give a balance with 60 minutes to use, which can be seen in the top right of the page.
 

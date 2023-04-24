@@ -124,13 +124,9 @@ defmodule PapaChallenge.Accounts do
   @doc """
 
   """
-  def update_user_balance_by_id(user_id, balance_adjustment) do
-    user = get_user!(user_id)
-
+  def update_user_balance(user, params) do
     user
-    |> User.balance_changeset(%{
-      balance_in_minutes: user.balance_in_minutes + balance_adjustment
-    })
+    |> User.balance_changeset(params)
     |> Repo.update()
   end
 

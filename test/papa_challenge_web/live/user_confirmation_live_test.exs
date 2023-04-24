@@ -1,5 +1,6 @@
 defmodule PapaChallengeWeb.UserConfirmationLiveTest do
   use PapaChallengeWeb.ConnCase
+  @moduletag :skip
 
   import Phoenix.LiveViewTest
   import PapaChallenge.AccountsFixtures

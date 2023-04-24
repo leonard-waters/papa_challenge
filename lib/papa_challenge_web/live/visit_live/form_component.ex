@@ -1,11 +1,7 @@
 defmodule PapaChallengeWeb.VisitLive.FormComponent do
   use PapaChallengeWeb, :live_component
 
-  alias PapaChallenge.Accounts
   alias PapaChallenge.Visits
-  alias PapaChallenge.Visits.Transactions.Query, as: TransactionQuery
-
-  @overhead 0.85
 
   @impl true
   def render(%{action: action} = assigns) when action in [:edit, :request] do
@@ -84,32 +80,18 @@ defmodule PapaChallengeWeb.VisitLive.FormComponent do
   end
 
   def handle_event("fulfill", _params, socket) do
-    visit = socket.assigns.visit
+    case Visits.fulfill_visit(socket.assigns.visit, socket.assigns.current_user.id) do
+      {:ok, %{visit: visit}} ->
+        notify_parent({:fulfilled, visit})
 
-    update_params = %{end_datetime: NaiveDateTime.utc_now(), status: :fulfilled}
+        {:noreply,
+         socket
+         |> put_flash(:info, "Visit fulfilled successfully")
+         |> push_patch(to: socket.assigns.patch)}
 
-    transaction_params = %{
-      pal_id: socket.assigns.current_user.id,
-      member_id: visit.member_id,
-      visit_id: visit.id
-    }
+      {:error, _op, %Ecto.Changeset{} = changeset, _changes} ->
+        {:noreply, assign_form(socket, changeset)}
 
-    # TODO: Refactor to a Multi Transaction in Visits context
-    with {:ok, updated_visit} <-
-           Visits.update_visit_on_fulfillment(visit, update_params),
-         {:ok, transaction} <- TransactionQuery.create_transaction(transaction_params),
-         {:ok, %{pal_compensation: pal_comp, overhead: _oh}} <-
-           calculate_compensation(updated_visit),
-         {:ok, _updated_pal} <- update_pal_balance(transaction.pal_id, pal_comp),
-         {:ok, _updated_member} <-
-           update_member_balance(updated_visit.member_id, updated_visit.minutes) do
-      notify_parent({:fulfilled, updated_visit})
-
-      {:noreply,
-       socket
-       |> put_flash(:info, "Visit fulfilled successfully")
-       |> push_patch(to: socket.assigns.patch)}
-    else
       {:error, %Ecto.Changeset{} = changeset} ->
         {:noreply, assign_form(socket, changeset)}
     end
@@ -152,20 +134,4 @@ defmodule PapaChallengeWeb.VisitLive.FormComponent do
   end
 
   defp notify_parent(msg), do: send(self(), {__MODULE__, msg})
-
-  # This could and probably should be handled a little more elegantly
-  defp calculate_compensation(%{minutes: minutes}) do
-    pal_comp = round(minutes * @overhead)
-    overhead = minutes - pal_comp
-
-    {:ok, %{pal_compensation: pal_comp, overhead: overhead}}
-  end
-
-  defp update_pal_balance(pal_id, pal_compensation) do
-    Accounts.update_user_balance_by_id(pal_id, pal_compensation)
-  end
-
-  defp update_member_balance(member_id, visit_minutes) do
-    Accounts.update_user_balance_by_id(member_id, -visit_minutes)
-  end
 end
