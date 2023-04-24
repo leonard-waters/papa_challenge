@@ -27,7 +27,7 @@ alias PapaChallenge.{Accounts, Visits, Visits.Transactions}
     first_name: "member",
     last_name: "test",
     password: "passwordtest",
-    balance_in_minutes: 0
+    balance_in_minutes: 60
   })
   |> IO.inspect()
 
